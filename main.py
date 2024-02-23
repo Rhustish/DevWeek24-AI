@@ -1,17 +1,16 @@
 from langchain_community.llms import HuggingFaceEndpoint
 from dotenv import load_dotenv
 import os
+import pdfhandler
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 load_dotenv()
 HUGGINGFACEHUB_API_TOKEN = os.environ["HUGGINGFACEHUB_API_TOKEN"]
 
 
-def operate(question):
+def operate(count,question):
 
-    template = """Question: {question}
-
-    Answer: Let's think step by step."""
+    template = """Take this data and generate {count} Test like questions and answers on it: {question}"""
 
     prompt = PromptTemplate.from_template(template)
     repo_id = "mistralai/Mistral-7B-Instruct-v0.2"
@@ -21,4 +20,9 @@ def operate(question):
     )
     llm_chain = LLMChain(prompt=prompt, llm=llm, output_key="text" , verbose=False)
     return llm_chain.invoke(question)
+
+def main():
+    prompt = pdfhandler.loadPdf("./somatosensory.pdf")
+    count = 200
+    operate(count,prompt)
 
