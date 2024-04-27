@@ -22,13 +22,17 @@ def healthcheck():
     return "OK"
 
 @app.post("/ep",status_code=200)
-async def resolver(file:UploadFile):
+async def resolver(file:UploadFile,count:int):
     with open(file.filename,'wb') as buffer:
         shutil.copyfileobj(file.file, buffer);
-    prompt = pdfhandler.loadPdf(file.filename)
-    count = 200
-    print(prompt)
-    main.operate(count,prompt)
+    pdfbuffer = pdfhandler.loadPdf(file.filename)
+    prompt = ""
+    for element in pdfbuffer:
+        tempdict = element.dict()
+        prompt+=tempdict['page_content']
+        prompt+=" "
+    out = await main.operate(count , prompt)
     os.remove(file.filename)
+    return out
     
     
